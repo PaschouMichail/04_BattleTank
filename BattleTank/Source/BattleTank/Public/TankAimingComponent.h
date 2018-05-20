@@ -12,7 +12,8 @@ enum class EFiringState : uint8
 {
 	Reloading,
 	Locked,
-	Aiming
+	Aiming,
+	OutOfAmmo
 };
 
 //Forward Declations
@@ -38,32 +39,41 @@ protected:
 		void Initialize(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet);
 
 	UPROPERTY(BlueprintReadOnly, Category = State)
-		EFiringState FiringState = EFiringState::Locked;
+		EFiringState FiringState = EFiringState::Reloading;
+
+	UPROPERTY(BlueprintReadOnly, Category = Ammo)
+		uint8 Ammo = 10;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	void AimAt(FVector HitLocation);
 
 	UFUNCTION(BlueprintCallable, Category = Firing)
 		void Fire();
 
+	EFiringState GetFiringState();
+
 private:
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
 	UTankBarrel* Barrel = nullptr;
 	UTankTurret* Turret = nullptr;
 
 	void MoveBarrel(FVector AimDirection);
 	void MoveTurret(FVector AimDirection);
 
+	bool IsBarrelMoving();
+
 	UPROPERTY(EditAnywhere, Category = Setup)
 		TSubclassOf<AProjectile> ProjectileBlueprint;
 
 	UPROPERTY(EditAnywhere, Category = Firing)
-		float LaunchSpeed = 100000;	//sensible starting value at 1000m/s
+		float LaunchSpeed = 10000;	//sensible starting value at 1000m/s
 
 	UPROPERTY(EditDefaultsOnly, Category = Firing)
 		float ReloadTimeSeconds = 3.f;
+
+	FVector AimDirection;
 
 	float LastFireTime;
 };
