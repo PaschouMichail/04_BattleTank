@@ -2,8 +2,10 @@
 
 #include "TankPlayerController.h"
 #include "TankAimingComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Engine/World.h"
 #include "BattleTank.h"
+#include "Tank.h"
 #include <Public/DrawDebugHelpers.h>
 
 void ATankPlayerController::BeginPlay()
@@ -72,7 +74,7 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 		HitResult,
 		CameraLocation,
 		CameraLocation + LookDirection * LineTraceRange,
-		ECollisionChannel::ECC_Visibility))
+		ECollisionChannel::ECC_Camera))
 	{
 		HitLocation = HitResult.Location;
 		return true;
@@ -82,4 +84,25 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVec
 		HitLocation = FVector(0.0f);
 		return false;
 	}
+}
+
+void ATankPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (InPawn)
+	{
+		ATank* PossessedTank = Cast<ATank>(InPawn);
+		if (!ensure(PossessedTank)) { return; }
+
+		PossessedTank->OnDeath.AddUniqueDynamic(this, &ATankPlayerController::OnTankDeath);
+
+	}
+}
+
+void ATankPlayerController::OnTankDeath()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Tank died."));
+	GetPawn()->FindComponentByClass<UParticleSystemComponent>()->Activate();
+	StartSpectatingOnly();
 }

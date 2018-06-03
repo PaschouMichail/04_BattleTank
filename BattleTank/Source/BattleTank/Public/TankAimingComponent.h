@@ -41,8 +41,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = State)
 		EFiringState FiringState = EFiringState::Reloading;
 
-	UPROPERTY(BlueprintReadOnly, Category = Ammo)
-		uint8 Ammo = 10;
+	UPROPERTY(EditDefaultsOnly, Category = Firing)
+		int32 Ammo = 10;
+
+	UFUNCTION(BLueprintCallable, Category = Firing)
+		int32 GetAmmo() const;
 
 public:	
 	void AimAt(FVector HitLocation);

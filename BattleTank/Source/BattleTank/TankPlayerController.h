@@ -14,6 +14,12 @@ class BATTLETANK_API ATankPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION()
+		void OnTankDeath();
+
+	virtual void SetPawn(APawn* InPawn) override;
+
 protected:
 	UPROPERTY(EditAnywhere)
 		float CrossshairXLocation = 0.5f;

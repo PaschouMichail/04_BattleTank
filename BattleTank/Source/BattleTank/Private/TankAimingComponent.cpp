@@ -17,6 +17,8 @@ UTankAimingComponent::UTankAimingComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	//Set Starting Ammo
+	Ammo = 12;
 }
 
 
@@ -24,9 +26,6 @@ UTankAimingComponent::UTankAimingComponent()
 void UTankAimingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//Set Starting Ammo
-	Ammo = 12;
 
 	//initial Firing State must be reloaded
 	LastFireTime = FPlatformTime::Seconds();
@@ -42,7 +41,7 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	{
 		FiringState = EFiringState::OutOfAmmo;
 	}
-	else if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeSeconds)
+	else if ((FPlatformTime::Seconds() - LastFireTime) < ReloadTimeSeconds)	//FPlatformTime::Seconds()
 	{
 		FiringState = EFiringState::Reloading;
 	}
@@ -60,6 +59,11 @@ void UTankAimingComponent::Initialize(UTankBarrel* BarrelToSet, UTankTurret* Tur
 {
 	Barrel = BarrelToSet;
 	Turret = TurretToSet;
+}
+
+int32 UTankAimingComponent::GetAmmo() const
+{
+	return Ammo;
 }
 
 EFiringState UTankAimingComponent::GetFiringState()
@@ -110,10 +114,10 @@ void UTankAimingComponent::Fire()
 	}
 }
 
-void UTankAimingComponent::MoveBarrel(FVector AimDirection)
+void UTankAimingComponent::MoveBarrel(FVector TargetAimDirection)
 {
 	FRotator BarrelRotator = Barrel->GetForwardVector().Rotation();
-	FRotator AimAsRotator = AimDirection.Rotation();
+	FRotator AimAsRotator = TargetAimDirection.Rotation();
 	FRotator DeltaRotator = AimAsRotator - BarrelRotator;
 
 	Barrel->Elevate(DeltaRotator.Pitch);
